@@ -1,8 +1,8 @@
 import Axios from 'axios'
 
 const instance = Axios.create({
-    baseURL: 'http://localhost:8000/',
-    timeout: 3000
+    baseURL: 'http://ctfer.vip:8000/',
+    timeout: 30000
 })
 
 instance.interceptors.request.use((config) => {
@@ -23,17 +23,9 @@ export const userLogin = (params: Object) => {
     return Axios.post('user/login', params).then(res => res.data);
 }
 
-export default (method: string, url: string, data=null) => {
-    method = method.toLowerCase()
-    if (method === 'post') {
-        return instance.post(url, data)
-    } else if (method === 'get') {
-        return instance.get(url, {params: data})
-    } else if (method === 'delete') {
-        return instance.delete(url, {params: data})
-    } else if (method === 'put') {
-        return instance.put(url, data)
-    } else {
-        return false
-    }
+export default {
+    get: (path: string, data=null) => instance.get(path, {params: data}),
+    post: (path: string, data=null) => instance.post(path, data),
+    put: (path: string, data=null) => instance.put(path, data),
+    delete: (path: string, data=null) => instance.delete(path, {params: data})
 }

@@ -1,6 +1,16 @@
 import { createStore } from 'vuex'
+import user from './modules/user'
+import note from './modules/note'
+
+const debug = process.env.NODE_ENV !== 'production';
 
 export default createStore({
+  modules: {
+    user,
+    note,
+  },
+  strict: debug,
+  plugins: debug ? [] : [],
   state: {
     userInfo: {}
   },
@@ -13,7 +23,5 @@ export default createStore({
     setUserInfo({commit}, user){
       commit('setUserInfo', user)
     }
-  },
-  modules: {
   }
 })
