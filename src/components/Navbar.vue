@@ -4,16 +4,15 @@
     mode="horizontal"
     @select="handleSelect"
   >
-    <el-menu-item index="1"><router-link to="/">NSS</router-link></el-menu-item>
-    <el-menu-item index="2"><router-link to="/problem">Problem</router-link></el-menu-item>
-    <el-menu-item index="3"><router-link to="/note">Note</router-link></el-menu-item>
-    <el-menu-item index="4"><router-link to="/contest">Contest</router-link></el-menu-item>
-    <el-menu-item index="5"><router-link to="/rank">Rank</router-link></el-menu-item>
-    <el-menu-item index="6"><router-link to="/user">User</router-link></el-menu-item>
-    <el-menu-item index="7"><router-link to="/prize">Prize</router-link></el-menu-item>
-    <el-menu-item index="8"><router-link to="/about">About</router-link></el-menu-item>
-
-    <div v-if="userInfo.uid">
+    <el-menu-item index="1">NSS</el-menu-item>
+    <el-menu-item index="2">Problem</el-menu-item>
+    <el-menu-item index="3">Note</el-menu-item>
+    <el-menu-item index="4">Contest</el-menu-item>
+    <el-menu-item index="5">Rank</el-menu-item>
+    <el-menu-item index="6">User</el-menu-item>
+    <el-menu-item index="7">prize</el-menu-item>
+    <el-menu-item index="8">About</el-menu-item>
+ <div v-if="isLogin">
       <el-submenu index="10">
         <template #title>{{userInfo.username}}</template>
         <el-menu-item index="10-1">
@@ -40,6 +39,8 @@
 
 <script>
 import { computed, reactive, toRefs } from 'vue'
+import { useStore } from 'vuex'
+import {useRouter} from 'vue-router'
 export default {
   computed: {
     userInfo() {
@@ -51,13 +52,39 @@ export default {
       activeIndex: "1"
     });
 
+    const store = useStore();
+    const router = useRouter();
+
+    const isLogin = computed(() => {
+      return store.getters['user/isLogin']
+    })
+    const userInfo = computed(() => {
+      return store.getters['user/getUserInfo']
+    })
+
+    const paths = [
+      '/',
+      '/',
+      '/problem',
+      '/note',
+      '/contest',
+      '/rank',
+      '/user',
+      '/prize',
+      '/about'
+    ]
+
     const handleSelect = (key, keyPath) => {
-      data.activeIndex = key
+      router.push({
+        path: paths[key]
+      })
     }
 
     return {
       ...toRefs(data),
 
+      isLogin,
+      userInfo,
       handleSelect
     }
   }

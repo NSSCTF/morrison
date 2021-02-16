@@ -27,10 +27,44 @@
 <script>
 import navbar from '@/components/Navbar'
 import selfFooter from '@/components/Footer'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import { computed } from 'vue'
+import Notify from '@/utils/notification'
+
 export default {
   components: {
     navbar,
     selfFooter
+  },
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+
+    const isLogin = store.getters['user/isLogin'];
+
+    router.beforeEach((to, from, next) => {
+      if (to.meta.requireLogin) {
+        if (isLogin == false) {
+          Notify.info({
+            message: "请先登陆!",
+            duration: 2000
+          });
+          
+          router.push({
+            path: '/user/login',
+            query: {
+              redirect: to.fullPath
+            }
+          });
+          // next();
+        } else {
+          next();
+        }
+      } else {
+        next();
+      }
+    })
   }
 }
 </script>
@@ -56,5 +90,11 @@ a {
   
   min-height: 100%;
   overflow-y: hidden;
+}
+body, select, input, text {
+	font-family: verdana,arial,sans-serif;
+}
+table {
+  font-size: 14px
 }
 </style>

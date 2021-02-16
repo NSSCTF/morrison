@@ -89,33 +89,6 @@ const actions = {
                 });
             });
         }
-    },
-    async openSubmenu ({commit}: {commit: any}, {type, index}: {type: NoteType, index: string}) {
-        let indexs = index.split("-");
-        if (indexs.length !== 1) {
-            await getNoteListBySetIdAndTypeId(parseInt(indexs[0]), parseInt(indexs[1])).then(res => {
-                commit('setSubmenus', {
-                    type: type,
-                    index: index,
-                    data: res.data
-                });
-            });
-        } else {
-            await getNoteListBySetIdAndTypeId(parseInt(indexs[0])).then(res => {
-                commit('setSubmenus', {
-                    type: type,
-                    index: index,
-                    data: res.data
-                });
-                for (let item of res.data) {
-                    commit('setTitlesByTypeAndIndex', {
-                        type: type,
-                        index: index + '-' + item.id,
-                        data: item.title
-                    });
-                }
-            })
-        }
     }
 };
 

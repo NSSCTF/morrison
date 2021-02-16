@@ -188,6 +188,7 @@ import {
 } from "@/restful/note";
 import { useRoute } from "vue-router";
 import { mapGetters, useStore } from "vuex"
+import handleNavTree from '@/utils/note/content'
 
 export default {
   components: { selfArticle },
@@ -284,7 +285,7 @@ export default {
           id: -id,
           title: res.data.title
         })
-        state.articleData.navList = handleNavTree();
+        state.articleData.navList = handleNavTree(res.data.content);
       });
     };
 
@@ -333,96 +334,6 @@ export default {
       let anchor = document.getElementById('head-'+a.index);
       moveScrollBar(anchor.offsetTop);
     }
-
-    const getTitle = (content) => {
-      let nav = [];
-
-      let tempArr = [];
-      content.replace(/(#+)[^#][^\n]*?(?:\n)/g, function(match, m1) {
-        let title = match.replace("\n", "");
-        let level = m1.length;
-        tempArr.push({
-          title: title.replace(/^#+/, "").replace(/\([^)]*?\)/, ""),
-          level: level,
-          children: [],
-        });
-      });
-
-      // 只处理二级到四级标题，以及添加与id对应的index值，这里还是有点bug,因为某些code里面的注释可能有多个井号
-      nav = tempArr.filter((item) => item.level >= 2 && item.level <= 4);
-      global.console.log(nav);
-      let index = 0;
-      return (nav = nav.map((item) => {
-        item.index = index++;
-        return item;
-      }));
-    };
-    // 将一级二级标题数据处理成树结构
-    const handleNavTree = () => {
-      let navs = getTitle(state.articleData.content);
-      let navLevel = [2, 3];
-      let retNavs = [];
-      let toAppendNavList;
-
-      navLevel.forEach((level) => {
-        // 遍历一级二级标题，将同一级的标题组成新数组
-        toAppendNavList = find(navs, {
-          level: level,
-        });
-
-        if (retNavs.length === 0) {
-          // 处理一级标题
-          retNavs = retNavs.concat(toAppendNavList);
-        } else {
-          // 处理二级标题，并将二级标题添加到对应的父级标题的children中
-          toAppendNavList.forEach((item) => {
-            item = Object.assign(item);
-            let parentNavIndex = getParentIndex(navs, item.index);
-            return appendToParentNav(retNavs, parentNavIndex, item);
-          });
-        }
-      });
-      return retNavs;
-    };
-
-    const find = (arr, condition) => {
-      return arr.filter((item) => {
-        for (let key in condition) {
-          if (condition.hasOwnProperty(key) && condition[key] !== item[key]) {
-            return false;
-          }
-        }
-        return true;
-      });
-    };
-
-    const getParentIndex = (nav, endIndex) => {
-      for (var i = endIndex - 1; i >= 0; i--) {
-        if (nav[endIndex].level > nav[i].level) {
-          return nav[i].index;
-        }
-      }
-    };
-
-    const appendToParentNav = (nav, parentIndex, newNav) => {
-      let index = findIndex(nav, {
-        index: parentIndex,
-      });
-      nav[index].children = nav[index].children.concat(newNav);
-    };
-
-    const findIndex = (arr, condition) => {
-      let ret = -1;
-      arr.forEach((item, index) => {
-        for (var key in condition) {
-          if (condition.hasOwnProperty(key) && condition[key] !== item[key]) {
-            return false;
-          }
-        }
-        ret = index;
-      });
-      return ret;
-    };
 
     const displayList = (index) => {
       let indexs = String(index).split("-");

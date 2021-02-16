@@ -19,13 +19,9 @@ instance.interceptors.response.use((res) => {
     return Promise.reject(err)
 })
 
-export const userLogin = (params: Object) => {
-    return Axios.post('user/login', params).then(res => res.data);
-}
-
 export default {
-    get: (path: string, data=null) => instance.get(path, {params: data}),
-    post: (path: string, data=null) => instance.post(path, data),
-    put: (path: string, data=null) => instance.put(path, data),
-    delete: (path: string, data=null) => instance.delete(path, {params: data})
+    get: (path: string, data: Object | null=null) => instance.get(path, {params: data}),
+    post: (path: string, data: Object | null=null) => instance.post(path, data),
+    put: (path: string, data: Object | null=null) => instance.put(path, data),
+    delete: (path: string, data: Object | null=null) => instance.delete(path, {params: data})
 }

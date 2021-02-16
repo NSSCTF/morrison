@@ -14,18 +14,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/index',
     name: 'Index',
     component: Home
-  },{
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/user/login.vue')
-  },{
+  },
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  },{
+  },
+  {
     name: 'notebook',
     path: '/note',
     component: () => import('../views/notebook/index.vue'),
@@ -42,6 +40,58 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  {
+    name: 'user',
+    path: '/user',
+    component: () => import('@/views/user/index.vue'),
+    children: [
+      {
+        path: 'setting',
+        name: 'editSetting',
+        component: () => import('@/views/user/components/setting.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: ':data',
+        name: 'userPage',
+        component: () => import('@/views/user/components/home.vue')
+      },
+      {
+        path: 'login',
+        name: 'userLogin',
+        component: () => import('@/views/user/components/login.vue')
+      },
+      {
+        path: 'register',
+        name: 'userRegister',
+        component: () => import('@/views/user/components/register.vue')
+      }
+    ]
+  },
+  {
+    path: '/problem',
+    name: 'problem',
+    component: () => import('@/views/problem/index.vue'),
+    children: [
+      {
+        path: '',
+        name: 'problemHomePage',
+        component: () => import('@/views/problem/components/home.vue')
+      },
+      {
+        path: 'set/:type',
+        name: 'problemSet',
+        component: () => import('@/views/problem/components/set.vue')
+      },
+      {
+        path: ':id',
+        name: 'problemInfo',
+        component: () => import('@/views/problem/components/info.vue')
+      }
+    ]
+  }
 ]
 
 const router = createRouter({
