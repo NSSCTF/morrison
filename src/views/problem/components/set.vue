@@ -58,7 +58,7 @@
   </el-row>
 </template>
 
-<script>
+<script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
 import {useRouter, useRoute} from 'vue-router'
 import {useStore} from 'vuex'
@@ -67,7 +67,7 @@ export default {
         const router = useRouter();
         const route = useRoute();
         const store = useStore();
-        const type = route.params.type.toLowerCase();
+        const type = (route.params.type as string).toLowerCase();
         const state = reactive({
             isLoading: false,
             title: type.toUpperCase(),
@@ -82,7 +82,7 @@ export default {
             return problemData.slice((state.page-1)*20,state.page*20);
         });
 
-        const toPage = (val) => {
+        const toPage = (val: any) => {
           state.page = val;
         }
 
@@ -90,7 +90,7 @@ export default {
           router.back()
         }
 
-        const filterLike = (value, row) => {
+        const filterLike = (value: any, row: any) => {
             return row.isLike === value;
         }
         store.dispatch('problem/setTableDataByType', {type: type}).then(() => {

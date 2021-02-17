@@ -29,8 +29,9 @@ import navbar from '@/components/Navbar'
 import selfFooter from '@/components/Footer'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 import Notify from '@/utils/notification'
+import * as echarts from 'echarts'
 
 export default {
   components: {
@@ -42,6 +43,8 @@ export default {
     const store = useStore();
 
     const isLogin = store.getters['user/isLogin'];
+
+    provide('ec',echarts);
 
     router.beforeEach((to, from, next) => {
       if (to.meta.requireLogin) {

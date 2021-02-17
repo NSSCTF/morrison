@@ -178,7 +178,7 @@
 
 <script>
 import { reactive, toRefs,onMounted, computed } from "vue";
-import * as CD from "../../mock/comment.js";
+import * as CD from "../../../mock/comment.js";
 import selfArticle from "./article";
 import {
   getNoteById,

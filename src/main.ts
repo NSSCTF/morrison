@@ -6,8 +6,9 @@ import ElementPlus from "element-plus"
 import 'element-plus/lib/theme-chalk/index.css'
 import HighLight from '@/utils/highlight'
 import i18n from '@/language/il8n'
-// import './plugins/element'
+import { highlight } from 'prismjs'
 
+// import './plugins/element'
 const app = createApp(App)
 app.use(ElementPlus)
 app.use(HighLight)

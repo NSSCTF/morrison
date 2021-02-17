@@ -37,7 +37,7 @@
 <script>
 import { computed, reactive, toRefs } from "vue";
 import comment from "./comment";
-import * as CD from "../../mock/comment.js";
+import * as CD from "../../../mock/comment.js";
 import marked from 'marked'
 import '@/assets/css/prism.css'
 
