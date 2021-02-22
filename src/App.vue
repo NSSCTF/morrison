@@ -4,12 +4,12 @@
       <el-col :span="24">
       
       </el-col>
-    </el-row> -->
+    </el-row>-->
     <!-- <el-row style="margin-top: 20px;margin-left: 10px;margin-right: 10px">
       <el-col :span="24">
       
       </el-col>
-    </el-row> -->
+    </el-row>-->
     <el-container>
       <el-header>
         <navbar />
@@ -17,9 +17,9 @@
       <el-main style="overflow: visible;">
         <router-view />
       </el-main>
-      <!-- <el-footer height="100px">
-        111
-      </el-footer> -->
+      <el-footer>
+        <selfFooter />
+      </el-footer>
     </el-container>
   </div>
 </template>
@@ -44,7 +44,7 @@ export default {
 
     const isLogin = store.getters['user/isLogin'];
 
-    provide('ec',echarts);
+    provide('ec', echarts);
 
     router.beforeEach((to, from, next) => {
       if (to.meta.requireLogin) {
@@ -53,7 +53,7 @@ export default {
             message: "请先登陆!",
             duration: 2000
           });
-          
+
           router.push({
             path: '/user/login',
             query: {
@@ -73,31 +73,36 @@ export default {
 </script>
 
 <style lang="scss">
-  html,body,#app,.el-container{
-        /*设置内部填充为0，几个布局元素之间没有间距*/
-        padding: 0px;
-         /*外部间距也是如此设置*/
-        margin: 0px;
-        /*统一设置高度为100%*/
-        height: 100%;
-        min-height: 100%;
-  }
+html,
+body,
+#app,
+.el-container {
+  /*设置内部填充为0，几个布局元素之间没有间距*/
+  padding: 0px;
+  /*外部间距也是如此设置*/
+  margin: 0px;
+  /*统一设置高度为100%*/
+  height: 100%;
+  min-height: 100%;
+}
 a {
-    text-decoration: none;
+  text-decoration: none;
 }
 .router-link-active {
   text-decoration: none;
 }
-.el-main{
+.el-main {
   width: 100%;
-  
-  min-height: 100%;
+  min-height: 60%;
   overflow-y: hidden;
 }
-body, select, input, text {
-	font-family: verdana,arial,sans-serif;
+body,
+select,
+input,
+text {
+  font-family: verdana, arial, sans-serif;
 }
 table {
-  font-size: 14px
+  font-size: 14px;
 }
 </style>

@@ -34,10 +34,9 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { computed, reactive, toRefs } from "vue";
-import comment from "./comment";
-import * as CD from "../../../mock/comment.js";
+// import comment from "./comment";
 import marked from 'marked'
 import '@/assets/css/prism.css'
 
@@ -50,8 +49,7 @@ export default {
   props: {
     articleData: Object
   },
-  components: { comment },
-  setup(props) {
+  setup(props: any) {
     const state = reactive({
       id: 0,
       title: props.articleData.title || "Welcome",
@@ -67,12 +65,12 @@ export default {
     });
     
     const commentData = reactive({
-      commentData: CD.comment.data,
+      commentData: [],
     });
 
     const compileMarkdown = computed(() => {
       let index = 0;
-      renderMd.heading = function(text, level) {
+      renderMd.heading = function(text: any, level: number) {
         if (level >= 2 && level <= 3) {
           return `<h${level} id="head-${index++}">${text}</h${level}>`;
         } else {

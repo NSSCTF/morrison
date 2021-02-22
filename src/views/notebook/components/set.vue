@@ -7,8 +7,8 @@
         </div>
       </el-col>
     </el-row>
-    <el-row v-loading="loadingId == -1">
-      <el-col :span="((2 + isCollapse) % 3) + 2">
+    <el-row v-loading="loadingId == -1" type="flex">
+      <el-col :span="((2 + (isCollapse?1:0)) % 3) + 2">
         <i
           @click="changeCollapse()"
           :class="'el-icon-' + collapseState"
@@ -285,7 +285,7 @@ export default {
           id: -id,
           title: res.data.title
         })
-        state.articleData.navList = handleNavTree(res.data.content);
+        state.articleData.navList = handleNavTree(res.data.content, 2, 3);
       });
     };
 

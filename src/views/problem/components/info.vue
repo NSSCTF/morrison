@@ -4,7 +4,7 @@
         <el-col :span="16">
             <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
                 <el-tab-pane label="题目" name="first">
-                    <el-card class="problem-card" :body-style="{ 'min-height': '500px' }">
+                    <el-card class="problem-card" :body-style="{ 'min-height': '500px' }" v-loading="problem.isLoading">
                         <div class="problem-title">
                             <p style="font-size: 28px">{{ problem.title }}</p>
                         </div>
@@ -35,20 +35,34 @@
                             </p>
                             <p v-if="problem.hint != false">
                                 提示：
-                                <el-button v-if="isHinted == false">显示提示</el-button>
+                                <el-button v-if="isHinted == false" @click="isDisplayButHintDialog = true">显示提示</el-button>
                                 <pre v-else>{{problem.hint}}</pre>
+                                <el-dialog
+                                title="提示"
+                                v-model="isDisplayButHintDialog"
+                                width="30%"
+                                center>
+                                <span>将花费{{problem.hint_price}}购买本题提示。</span>
+                                <template #footer>
+                                    <span class="dialog-footer">
+                                    <el-button @click="isDisplayButHintDialog = false">取 消</el-button>
+                                    <el-button type="primary" @click="handleOpenHint">确 定</el-button>
+                                    </span>
+                                </template>
+
+                                </el-dialog>
                             </p>
                         </div>
                         <div class="problem-footer">
                             <template v-if="isOpen == false">
-                                <el-button>开启环境</el-button>
+                                <el-button @click="handleOpenDocker">开启环境</el-button>
                             </template>
                             <template v-else>
                                 <p>
-                                    <router-link to="/">{{ docker.url }}</router-link>
+                                    <a :href="docker.url" target="blank">{{ docker.url }}</a>
                                 </p>
-                                <el-button>关闭环境</el-button>
-                                <el-button>延长时间</el-button>
+                                <el-button @click="handleCloseDocker">关闭环境</el-button>
+                                <el-button @click="handleDelayDocker">延长时间</el-button>
                             </template>
                             <el-button v-if="problem.annex != false">附件下载</el-button>
                             <div class="problem-flag">
@@ -64,7 +78,31 @@
                     </el-card>
                 </el-tab-pane>
                 <el-tab-pane label="讨论区" name="second" :disabled="isSolved == false">讨论区</el-tab-pane>
-                <el-tab-pane label="Write Up" name="third">WP</el-tab-pane>
+                <el-tab-pane label="Write Up" name="third">
+                    <el-table :data="wpData" stripe style="width: 100%">
+                        <el-table-column prop="author" label="作者" width="180" align="center"></el-table-column>
+                        <el-table-column prop="date" label="日期" align="center" width="200"></el-table-column>
+                        <el-table-column prop="url" label="链接" align="center" width="700"></el-table-column>
+                        <el-table-column prop="likes" label="#" align="right"></el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="详细数据" name="four">
+                    <div class="statistics-head">
+                        <el-row>
+                            <el-col :span="12">
+                        <p id="levelInfo" style="width: 100%;">22</p>
+                        </el-col>
+                        <el-col :span="11">
+                        <p id="timeInfo" style="width: 100%;">11</p>
+                        </el-col>
+                        </el-row>
+                        <el-table :data="solveData" stripe style="width: 100%">
+                            <el-table-column prop="author" label="用户"></el-table-column>
+                            <el-table-column prop="date" label="日期"></el-table-column>
+                            <el-table-column prop="time" label="用时(分)"></el-table-column>
+                        </el-table>
+                    </div>
+                </el-tab-pane>
             </el-tabs>
         </el-col>
         <el-col :span="1"></el-col>
@@ -78,13 +116,20 @@
                 </template>
                 <router-link :to="'/user/' + problem.uid">{{problem.author}}</router-link>
             </el-card>
+            <el-card style="margin-top: 30px;">
+            <el-collapse>
+                <el-collapse-item title="我的评价">
+                    <p>难度评分：<el-rate v-model="myInfo.level" @change="handleMyInfoLevelChange" allow-half show-score style="display: inline"></el-rate></p>
+                </el-collapse-item>
+            </el-collapse>
+            </el-card>
         </el-col>
     </el-row>
 </template>
 <script lang="ts">
 import { inject, onMounted, reactive, toRefs } from "vue";
 import { useRoute } from 'vue-router'
-import { getProblemInfoById } from '@/restful/problem'
+import { getMyRateInfoById, getProblemInfoById,postOpenHintById,postSubmitFlagById,putProblemLevelById } from '@/restful/problem'
 import { getDockerInfoById } from '@/restful/docker'
 import Notification from '@/utils/notification'
 import problem from '@/mock/problem'
@@ -108,7 +153,8 @@ export default {
                 hint_price: 0,
                 tag: [] as string[],
                 annex: false,
-                level: 0
+                level: 0,
+                isLoading: true
             },
             info: {
                 solved: 42,
@@ -119,9 +165,16 @@ export default {
                 url: 'http://docker.ctfer.vip/asd',
                 remain: 0
             },
+            myInfo: {
+                level: 0,
+                isRated: false
+            },
+            solveData: [],
+            wpData: [],
             isOpen: true,
-            isSolved: true,
-            isHinted: true
+            isSolved: false,
+            isHinted: false,
+            isDisplayButHintDialog: false
         });
 
         onMounted(() => {
@@ -157,8 +210,23 @@ export default {
             }
         })
 
+        const getMyRateInfo = () => {
+            getMyRateInfoById(id).then(res => {
+                if (res.data.code === 200) {
+                    state.myInfo.isRated = res.data.level != false;
+                    state.myInfo.level = res.data.level ? res.data.level : 0;
+                } else {
+                    Notification.error({
+                        message: "获取「我的评价」数据失败。"
+                    })
+                }
+            })
+        }
+
         getProblemInfoById(id).then(res => {
             if (res.data.code == 200) {
+                state.problem.isLoading = false;
+
                 state.problem.title = res.data.title;
                 state.problem.desc = res.data.desc;
                 state.problem.hint = res.data.hint;
@@ -174,6 +242,14 @@ export default {
                 state.info.solved = res.data.info.solved;
                 state.info.wa = res.data.info.wa;
                 state.info.na = res.data.na;
+
+                if (res.data.is_solved) {
+                    getMyRateInfo()
+                }
+
+                if (res.data.is_hinted) {
+                    state.problem.hint = res.data.hint
+                }
             } else {
                 Notification.error({
                     message: '题目数据获取失败！'
@@ -194,15 +270,67 @@ export default {
             console.log(tab, event)
         }
 
+        const handleOpenHint = () => {
+            state.isDisplayButHintDialog = false;
+            postOpenHintById(id).then(res => {
+                if (res.data.code === 200) {
+                    state.isHinted = true;
+                    state.problem.hint = res.data.hint;
+                } else if (res.data.code === 201) {
+                    Notification.warning({message: "余额不足，购买提示失败。"});
+                }
+            })
+        }
+
         const submitFlag = () => {
-            console.log(state.flag)
+            postSubmitFlagById(id, state.flag).then(res => {
+                if (res.data.code === 200) {
+                    Notification.success({message: "恭喜成功解出本题！你可以在「我的评价」中添加评分。"});
+                    state.isSolved = true;
+                    getMyRateInfo();
+                } else {
+                    Notification.warning({message: "flag有误，请重新提交。"});
+                }
+            })
+        }
+
+        const handleMyInfoLevelChange = () => {
+            if (state.myInfo.isRated) {
+                Notification.info({message: "你已经提交过评分了！"});
+            } else {
+                putProblemLevelById(id, state.myInfo.level).then(res => {
+                    if (res.data.code === 200) {
+                        Notification.success({message: "感谢你的评分数据！"})
+                    } else {
+                        Notification.error({message: "评分出错！请稍后重试。"})
+                    }
+                });
+            }
+        }
+
+        const handleOpenDocker = () => {
+
+        }
+
+        const handleCloseDocker = () => {
+
+        }
+
+        const handleDelayDocker = () => {
+
         }
 
         return {
             ...toRefs(state),
 
             handleClick,
+            handleOpenHint,
             submitFlag,
+            handleMyInfoLevelChange,
+            
+            handleOpenDocker,
+            handleCloseDocker,
+            handleDelayDocker,
         }
     }
 };

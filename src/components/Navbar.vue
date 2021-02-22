@@ -10,7 +10,7 @@
     <el-menu-item index="4">Contest</el-menu-item>
     <el-menu-item index="5">Rank</el-menu-item>
     <el-menu-item index="6">User</el-menu-item>
-    <el-menu-item index="7">prize</el-menu-item>
+    <el-menu-item index="7">Prize</el-menu-item>
     <el-menu-item index="8">About</el-menu-item>
  <div v-if="isLogin">
       <el-submenu index="10">
@@ -27,12 +27,12 @@
       </el-submenu>
       
       <span style="float: right; line-height: 56px;">|</span>
-      <el-menu-item index="9" key="login" style="float: right"><router-link to="/logout">Logout</router-link></el-menu-item>
+      <el-menu-item index="9" key="login" style="float: right"><router-link to="/user/logout">Logout</router-link></el-menu-item>
     </div>
     <div v-else>
-      <el-menu-item index="12" key="register" style="float: right"><router-link to="/register">Register</router-link></el-menu-item>
+      <el-menu-item index="12" key="register" style="float: right"><router-link to="/user/register">Register</router-link></el-menu-item>
       <span style="float: right; line-height: 56px;">|</span>
-      <el-menu-item index="11" key="login" style="float: right"><router-link to="/login">Login</router-link></el-menu-item>
+      <el-menu-item index="11" key="login" style="float: right"><router-link to="/user/login">Login</router-link></el-menu-item>
     </div>
   </el-menu>
 </template>
