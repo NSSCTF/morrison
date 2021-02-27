@@ -91,6 +91,23 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/problem/components/info.vue')
       }
     ]
+  },
+  {
+    path: '/contest',
+    name: 'contest',
+    component: () => import('@/views/contest/index.vue'),
+    children: [
+      {
+        path: '',
+        name: 'contestSet',
+        component: () => import('@/views/contest/components/set.vue')
+      },
+      {
+        path: ':cid',
+        name: 'contestInfo',
+        component: () => import('@/views/contest/components/info.vue')
+      }
+    ]
   }
 ]
 

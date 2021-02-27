@@ -68,7 +68,7 @@ export default {
       };
       userLogin(params)
         .then((res) => {
-          if (res.data.code === 200) {
+          if (res.code === 200) {
             let redirect = decodeURIComponent(router.query.redirect || "/");
             let page = "之前浏览界面";
             if (redirect == "/") {

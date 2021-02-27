@@ -2,9 +2,9 @@
     <el-row>
         <el-col :span="1"></el-col>
         <el-col :span="16">
-            <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+            <el-tabs v-model="activeName" type="card" @tab-click="handleClick" element-loading-text="加载中...">
                 <el-tab-pane label="题目" name="first">
-                    <el-card class="problem-card" :body-style="{ 'min-height': '500px' }" v-loading="problem.isLoading">
+                    <el-card class="problem-card" :body-style="{ 'min-height': '500px' }" v-loading="problem.isLoading" element-loading-text="加载中...">
                         <div class="problem-title">
                             <p style="font-size: 28px">{{ problem.title }}</p>
                         </div>
@@ -171,6 +171,7 @@ export default {
             },
             solveData: [],
             wpData: [],
+
             isOpen: true,
             isSolved: false,
             isHinted: false,
@@ -212,7 +213,7 @@ export default {
 
         const getMyRateInfo = () => {
             getMyRateInfoById(id).then(res => {
-                if (res.data.code === 200) {
+                if (res.code === 200) {
                     state.myInfo.isRated = res.data.level != false;
                     state.myInfo.level = res.data.level ? res.data.level : 0;
                 } else {
@@ -224,7 +225,7 @@ export default {
         }
 
         getProblemInfoById(id).then(res => {
-            if (res.data.code == 200) {
+            if (res.code == 200) {
                 state.problem.isLoading = false;
 
                 state.problem.title = res.data.title;
@@ -273,10 +274,10 @@ export default {
         const handleOpenHint = () => {
             state.isDisplayButHintDialog = false;
             postOpenHintById(id).then(res => {
-                if (res.data.code === 200) {
+                if (res.code === 200) {
                     state.isHinted = true;
                     state.problem.hint = res.data.hint;
-                } else if (res.data.code === 201) {
+                } else if (res.code === 201) {
                     Notification.warning({message: "余额不足，购买提示失败。"});
                 }
             })
@@ -284,7 +285,7 @@ export default {
 
         const submitFlag = () => {
             postSubmitFlagById(id, state.flag).then(res => {
-                if (res.data.code === 200) {
+                if (res.code === 200) {
                     Notification.success({message: "恭喜成功解出本题！你可以在「我的评价」中添加评分。"});
                     state.isSolved = true;
                     getMyRateInfo();
@@ -299,7 +300,7 @@ export default {
                 Notification.info({message: "你已经提交过评分了！"});
             } else {
                 putProblemLevelById(id, state.myInfo.level).then(res => {
-                    if (res.data.code === 200) {
+                    if (res.code === 200) {
                         Notification.success({message: "感谢你的评分数据！"})
                     } else {
                         Notification.error({message: "评分出错！请稍后重试。"})
