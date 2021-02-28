@@ -27,12 +27,12 @@
       </el-submenu>
       
       <span style="float: right; line-height: 56px;">|</span>
-      <el-menu-item index="9" key="login" style="float: right"><router-link to="/user/logout">Logout</router-link></el-menu-item>
+      <router-link to="/user/logout"><el-menu-item index="9" key="login" style="float: right">Logout</el-menu-item></router-link>
     </div>
     <div v-else>
-      <el-menu-item index="12" key="register" style="float: right"><router-link to="/user/register">Register</router-link></el-menu-item>
+      <router-link to="/user/register"><el-menu-item index="12" key="register" style="float: right">Register</el-menu-item></router-link>
       <span style="float: right; line-height: 56px;">|</span>
-      <el-menu-item index="11" key="login" style="float: right"><router-link to="/user/login">Login</router-link></el-menu-item>
+      <router-link to="/user/login"><el-menu-item index="11" key="login" style="float: right">Login</el-menu-item></router-link>
     </div>
   </el-menu>
 </template>

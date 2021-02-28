@@ -178,6 +178,8 @@ export default {
                 state.countDown -= 1;
                 state.countDownProcess = (1 - state.countDown / (state.endsDate - state.startDate))*100;
                 setTimeout(handleCountDown, 1000);
+            } else if (state.contestState == 3) {
+                state.countDownProcess = 100;
             }
         }
 
