@@ -1,7 +1,7 @@
 import req from './api'
 
 export const userLogin = (params: Object) => {
-    return req.post('user/login', params);
+    return req.post('user/login/', params);
 }
 
 export const getUserInfoByIdOrName = (data: string) => {
@@ -18,4 +18,8 @@ export const postRegisterUser = (data: Object) => {
 
 export const postRegisterSendVerifyCode = (data: Object) => {
     return req.post('/user/register/verify/', data);
+}
+
+export const postUploadUserAvater = (form: any) => {
+    return req.post('/user/avatar/update/', form);
 }

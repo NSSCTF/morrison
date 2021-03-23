@@ -67,6 +67,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'register',
         name: 'userRegister',
         component: () => import('@/views/user/components/register.vue')
+      },
+      {
+        path: 'logout',
+        name: 'userLogout',
+        component: () => import('@/views/user/components/logout.vue')
       }
     ]
   },
@@ -106,6 +111,18 @@ const routes: Array<RouteRecordRaw> = [
         path: ':cid',
         name: 'contestInfo',
         component: () => import('@/views/contest/components/info.vue')
+      }
+    ]
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('@/views/admin/index.vue'),
+    children: [
+      {
+        path: '',
+        name: 'adminHome',
+        component: () => import('@/views/admin/components/admin.vue')
       }
     ]
   }

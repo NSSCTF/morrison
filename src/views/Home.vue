@@ -1,7 +1,5 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/image/logo.png">
-  </div>
+  <div class="home"></div>
 </template>
 
 <script lang="ts">
@@ -15,3 +13,10 @@ import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 })
 export default class Home extends Vue {}
 </script>
+
+<style lang="scss">
+.home {
+  background: url('~@/assets/image/logo.png') center center no-repeat;
+  background-size: 100px auto;
+}
+</style>

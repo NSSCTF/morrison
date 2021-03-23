@@ -1,8 +1,9 @@
 import Axios from 'axios'
 
 const instance = Axios.create({
-    baseURL: 'http://ctfer.vip:8000/',
-    timeout: 30000
+    baseURL: 'http://localhost:9000/',
+    timeout: 30000,
+    withCredentials: true,
 })
 
 instance.interceptors.request.use((config) => {

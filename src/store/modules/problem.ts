@@ -29,20 +29,18 @@ const getters = {
 
 const actions = {
     async setTableDataByTypeAndPage ({commit, state}: {commit: any, state: ProblemState}, {type, page}: {type: ProblemType, page: number}) {
-        await getProblemByTypeAndPage(type, page).then(res => {
-            commit('setTableDataByTypeAndPage', {
-                type: type,
-                data: res.data
-            })
-        })
+        let res = await getProblemByTypeAndPage(type, page);
+        commit('setTableDataByTypeAndPage', {
+            type: type,
+            data: res.data
+        });
     },
     async setTableDataByType ({commit}: {commit: any}, {type}: {type: ProblemType}) {
-        await getProblemByType(type).then(res => {
-            commit('setTableDataByType', {
-                type: type,
-                data: res.data
-            })
-        })
+        let res = await getProblemByType(type);
+        commit('setTableDataByType', {
+            type: type,
+            data: res.data
+        });
     }
 }
 

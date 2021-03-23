@@ -1,5 +1,5 @@
 <template>
-  <div class="article" v-loading="articleData.isLoading != false && true">
+  <div class="article" v-loading="articleData.isLoading != false && true" v-nss-title="'文章 - ' + title">
     <div class="article-head">
       <span class="article-title">{{articleData.title || title}}</span>
       <el-row>

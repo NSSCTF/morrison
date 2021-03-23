@@ -1,15 +1,42 @@
 <template>
-    <el-row>
+    <el-row v-nss-title="username + '的主页'">
         <el-col :span="3"></el-col>
         <el-col :span="18" v-loading="isLoading" element-loading-text="加载中...">
             <el-card style="width: 100%;height: 200px;">
                 <div style="height: 200px">
-                    <img class="user-avatar" :src="avatar" />
+                    <el-avatar
+                        class="user-avatar"
+                        :src="avatar"
+                        @click="isMySelfSpace && (uploadAvatarDialogVisible = true)"
+                        @error="avatar = require('@/assets/image/default.jpg')"
+                    />
                     <div class="user-info">
-                        <div style="font-size: 36px">X3NNY</div>
-                        <div>凭君莫话封侯事，一将成名万骨枯。</div>
+                        <div style="font-size: 42px; margin-bottom: 5px">
+                            <b>{{ username.toUpperCase() }}</b>
+                        </div>
+                        <div>{{ bio }}</div>
                     </div>
                 </div>
+                <el-dialog title="上传头像" v-model="uploadAvatarDialogVisible" width="30%" center>
+                    <el-upload
+                        class="avatar-uploader"
+                        :action="AVATAR_UPLOAD_URL"
+                        :show-file-list="false"
+                        with-credentials
+                        :http-request="myAvatarUpload"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload"
+                    >
+                        <img v-if="uploadAvatarUrl" :src="uploadAvatarUrl" class="avatar" />
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+                    <template #footer>
+                        <span class="dialog-footer">
+                            <!-- <el-button @click="uploadAvatarDialogVisible = false">取 消</el-button> -->
+                            <el-button type="primary" @click="uploadAvatarDialogVisible = false">确 定</el-button>
+                        </span>
+                    </template>
+                </el-dialog>
             </el-card>
             <el-card>
                 <div class="user-nav">
@@ -55,25 +82,28 @@
                         <li :tabindex="1">
                             <div>
                                 <span>关注</span>
-                                <span>{{following}}</span>
+                                <span>{{ following }}</span>
                             </div>
                         </li>
                         <li :tabindex="1">
                             <div>
                                 <span>粉丝</span>
-                                <span>{{followers}}</span>
+                                <span>{{ followers }}</span>
                             </div>
                         </li>
                         <li :tabindex="1">
                             <div>
                                 <span>解题</span>
-                                <span>{{solves}}#{{solveRank}}</span>
+                                <span>{{ solves }}#{{ solveRank }}</span>
                             </div>
                         </li>
                         <li :tabindex="1">
                             <div>
                                 <span>积分</span>
-                                <span><b :class="ratingClass()">{{rating}}</b>#{{ratingRank}}</span>
+                                <span>
+                                    <b :class="ratingClass()">{{ rating }}</b>
+                                    #{{ ratingRank }}
+                                </span>
                             </div>
                         </li>
                     </ul>
@@ -91,14 +121,17 @@
                         <div id="solveInfo" style="width: 100%;height: 300px"></div>
                     </div>
 
-                    <div v-if="userNavActiveId == 3">
-                        
-                    </div>
+                    <div v-if="userNavActiveId == 3"></div>
 
                     <div v-else-if="userNavActiveId == 4"></div>
                     <div v-else-if="userNavActiveId == 5">
                         <ul class="user-setting">
-                            <li><span>公开邮箱</span><span><el-switch active-color="#13ce66" inactive-color="#ff4949"></el-switch></span></li>
+                            <li>
+                                <span>公开邮箱</span>
+                                <span>
+                                    <el-switch active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                                </span>
+                            </li>
                         </ul>
                     </div>
                 </el-col>
@@ -106,23 +139,23 @@
                     <el-card>
                         <div style="justify-content: space-between;display: flex;padding: 5px 10px">
                             <span>用户ID</span>
-                            <span>{{uid}}</span>
+                            <span>{{ uid }}</span>
                         </div>
                         <div style="justify-content: space-between;display: flex;padding: 5px 10px">
                             <span>用户名</span>
-                            <span>{{username}}</span>
+                            <span>{{ username }}</span>
                         </div>
                         <div style="justify-content: space-between;display: flex;padding: 5px 10px">
                             <span>注册时间</span>
-                            <span>{{registerDate}}</span>
+                            <span>{{ registerDate }}</span>
                         </div>
                         <div style="justify-content: space-between;display: flex;padding: 5px 10px">
                             <span>上次登陆</span>
-                            <span>{{lastLoginDate}}</span>
+                            <span>{{ lastLoginDate }}</span>
                         </div>
                         <div style="justify-content: space-between;display: flex;padding: 5px 10px">
                             <span>Email</span>
-                            <span>{{email}}</span>
+                            <span>{{ email }}</span>
                         </div>
                     </el-card>
                     <el-card header="团队" style="margin-top: 36px;">
@@ -136,9 +169,12 @@
 </template>
 <script lang="ts">
 import { useRoute } from 'vue-router'
-import { getUserInfoByIdOrName } from '@/restful/user';
-import {useStore} from 'vuex'
+import { getUserInfoByIdOrName, postUploadUserAvater } from '@/restful/user';
+import { useStore } from 'vuex'
 import { inject, onMounted, reactive, toRefs, watch } from 'vue';
+import { AVATAR_UPLOAD_URL } from '@/config'
+import Notification from '@/utils/notification'
+
 export default {
     setup() {
         const route = useRoute();
@@ -150,6 +186,7 @@ export default {
 
         const state = reactive({
             uid: 0,
+            bio: '',
             username: '',
             avatar: '',
             registerDate: '',
@@ -166,6 +203,9 @@ export default {
 
             isLoading: true,
             isMySelfSpace: false,
+            uploadAvatarDialogVisible: false,
+            uploadAvatarUrl: undefined,
+            AVATAR_UPLOAD_URL: AVATAR_UPLOAD_URL,
         })
 
         watch(
@@ -176,18 +216,19 @@ export default {
         )
 
         const lastLoginDateFormat = (date: number) => {
+            date = Math.round(((new Date()).getTime() - date) / 1000 / 60);
             if (date == 0) {
                 return "在线";
             } else if (date < 60) {
                 return `${date}分钟之前`;
-            } else if (date < 60*24) {
-                return `${Math.round(date/60)}小时之前`;
-            } else if (date < 60*24*30) {
-                return `${Math.round(date/60/24)}天之前`;
-            } else if (date < 60*24*30*12) {
-                return `${Math.round(date/60/24/30)}月之前`;
+            } else if (date < 60 * 24) {
+                return `${Math.round(date / 60)}小时之前`;
+            } else if (date < 60 * 24 * 30) {
+                return `${Math.round(date / 60 / 24)}天之前`;
+            } else if (date < 60 * 24 * 30 * 12) {
+                return `${Math.round(date / 60 / 24 / 30)}月之前`;
             } else {
-                return `${Math.round(date/60/24/30)}年之前`;
+                return `${Math.round(date / 60 / 24 / 30)}年之前`;
             }
         }
 
@@ -202,18 +243,19 @@ export default {
         getUserInfoByIdOrName(data).then(res => {
             if (res.code == 200) {
                 state.uid = res.data.uid;
+                state.bio = res.data.bio;
                 state.username = res.data.username;
                 state.avatar = res.data.avatar;
-                state.registerDate = new Date(res.data.registerDate).toLocaleString();
+                state.registerDate = new Date(res.data.register_date).toLocaleString();
                 state.lastLoginDate = lastLoginDateFormat(res.data.last_login_date);
                 state.email = res.data.email ? res.data.email : '未公开';
 
                 state.followers = res.data.followers;
                 state.following = res.data.following;
                 state.solves = res.data.solves;
-                state.solveRank = res.data.solveRank;
+                state.solveRank = res.data.solve_rank;
                 state.rating = res.data.rating;
-                state.ratingRank = res.data.ratingRank;
+                state.ratingRank = res.data.rating_rank;
 
                 if (loginUid == res.data.uid) {
                     state.isMySelfSpace = true;
@@ -290,16 +332,50 @@ export default {
                     }
                 ]
             });
-            window.onresize = () => {solveInfoChart.resize();}
+            window.onresize = () => { solveInfoChart.resize(); }
             // solveInfoChart.resize();
-            setTimeout(() => {solveInfoChart.resize()}, 1000);
-            
+            setTimeout(() => { solveInfoChart.resize() }, 1000);
+
         });
+
+        const beforeAvatarUpload = (file: any) => {
+            const isValid = (file.type === 'image/jpeg' || file.type === 'image/png');
+            const isLt5M = file.size / 1024 / 1024 < 5;
+
+            if (!isValid) {
+                Notification.error({
+                    message: '上传头像图片只能是 JPG & PNG 格式!'
+                });
+            }
+            if (!isLt5M) {
+                Notification.error({
+                    message: '上传头像图片大小不能超过 5MB!'
+                });
+            }
+            return isValid && isLt5M;
+        }
+
+        const handleAvatarSuccess = (res: any, file: any) => {
+            console.log(res.data)
+            state.uploadAvatarUrl = res.data;
+            state.avatar = res.data;
+        }
+
+        const myAvatarUpload = (content: any) => {
+            let formData = new FormData();
+            formData.append('file', content.file);
+            postUploadUserAvater(formData).then((res: any) => {
+                handleAvatarSuccess(res, content.file)
+            })
+        }
 
         return {
             ...toRefs(state),
 
             ratingClass,
+            beforeAvatarUpload,
+            handleAvatarSuccess,
+            myAvatarUpload
         }
     }
 }
@@ -307,8 +383,8 @@ export default {
 
 <style lang="scss">
 .user-avatar {
-    width: 64px;
-    height: 64px;
+    width: 100px;
+    height: 100px;
     // bottom: 84px;
     top: 20px;
     left: 20px;
@@ -317,13 +393,11 @@ export default {
     position: absolute;
 }
 
-
-
 .user-info {
     position: absolute;
-    top: 20px;
+    top: 24px;
     // margin-bottom: 90px;
-    left: 96px;
+    left: 134px;
 }
 
 .user-nav {
@@ -354,7 +428,6 @@ export default {
 }
 
 .user-setting li span {
-
 }
 
 .user-nav .left li {
@@ -412,5 +485,29 @@ export default {
 
 .rating-master {
     color: red;
+}
+
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+}
+.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+}
+.avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
 }
 </style>

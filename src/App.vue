@@ -17,26 +17,25 @@
       <el-main style="overflow: visible;">
         <router-view />
       </el-main>
-      <el-footer>
+      <!-- <el-footer>
         <selfFooter />
-      </el-footer>
+      </el-footer> -->
     </el-container>
   </div>
 </template>
 
-<script>
-import navbar from '@/components/Navbar'
-import selfFooter from '@/components/Footer'
+<script lang="ts">
+import navbar from '@/components/Navbar.vue'
+// import selfFooter from '@/components/Footer'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { computed, provide } from 'vue'
+import { computed, onMounted, provide, reactive, toRefs } from 'vue'
 import Notify from '@/utils/notification'
 import * as echarts from 'echarts'
 
 export default {
   components: {
-    navbar,
-    selfFooter
+    navbar
   },
   setup() {
     const router = useRouter();
@@ -45,6 +44,13 @@ export default {
     const isLogin = store.getters['user/isLogin'];
 
     provide('ec', echarts);
+
+    onMounted(() => {
+      window.addEventListener('unload', saveState)
+    })
+    const saveState = () => {
+      sessionStorage.setItem('user_state', JSON.stringify(store.state.user))
+    }
 
     router.beforeEach((to, from, next) => {
       if (to.meta.requireLogin) {
@@ -67,7 +73,7 @@ export default {
       } else {
         next();
       }
-    })
+    });
   }
 }
 </script>

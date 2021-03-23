@@ -1,5 +1,5 @@
 <template>
-  <el-row style="text-align: center;margin-top: 10%;" type="flex" justify="space-between">
+  <el-row style="text-align: center;margin-top: 10%;" type="flex" justify="space-between" v-nss-title="'文章种类'">
     <el-col :span="8">
       <el-image
         :src="require('@/assets/image/logo.png')"

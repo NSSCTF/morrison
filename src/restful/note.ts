@@ -1,5 +1,5 @@
 import req from './api'
-
+import Axios from 'axios'
 
 export const getNoteById = (id: Number) => {
     return req.get(`notebook/article/${id}`);
@@ -19,6 +19,10 @@ export const getSetById = (id: Number) => {
 
 export const getCommentById = (id: Number) => {
     return req.get(`notebook/article/${id}/comment/`)
+}
+
+export const getContentFromUrl = (url: string) => {
+    return Axios.get(url);
 }
 // export const getNoteListById = (id: Number) => {
 //     return Axios.get(`notebook/category/${id}`).then(res => res.data);

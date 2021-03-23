@@ -1,5 +1,5 @@
 <template>
-    <el-row>
+    <el-row v-nss-title="'注册'">
         <el-col :span="2"></el-col>
         <el-col :span="20">
             <el-steps :active="activeStep" finish-status="success" style="margin-top: 20px">
@@ -45,8 +45,8 @@
             </div>
             <div style="margin-top: 15%;width: 50%;margin-left: 25%;" v-if="activeStep == 2">
                 <el-form :model="registerForm" label-width="80px" :inline="false" size="normal">
-                    <el-form-item label="验证码" prop="inviteCode">
-                        <el-input v-model="registerForm.inviteCode" placeholder="检查邮箱中的验证码..."></el-input>
+                    <el-form-item label="验证码" prop="verifyCode">
+                        <el-input v-model="registerForm.verifyCode" placeholder="检查邮箱中的验证码..."></el-input>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="submitForm">激活</el-button>

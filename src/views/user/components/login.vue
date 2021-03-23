@@ -1,5 +1,5 @@
 <template>
-  <el-row>
+  <el-row v-nss-title="'登陆'">
     <el-col :span="4"></el-col>
     <el-col :span="16" style="margin-top: 20px">
       <h1 style="text-align: center;font-size: 64px">NSSCTF Login</h1>
@@ -21,7 +21,7 @@
           <el-button type="primary" @click="submitForm('loginForm')"
             >登陆</el-button
           >
-          <el-button @click="resetForm('loginForm')">清空</el-button>
+          <el-button @click="resetForm">清空</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -29,8 +29,8 @@
   </el-row>
 </template>
 
-<script>
-import { useRoute } from "vue-router";
+<script lang="ts">
+import { useRouter, useRoute } from "vue-router";
 import { userLogin } from "@/restful/user";
 import { useStore } from "vuex";
 import { reactive, toRefs, ref } from "vue";
@@ -38,7 +38,8 @@ import notify from "@/utils/notification";
 
 export default {
   setup() {
-    const router = useRoute();
+    const route = useRoute();
+    const router = useRouter();
     const store = useStore();
     const state = reactive({
       loginForm: {
@@ -48,7 +49,7 @@ export default {
       rules: {
         username: [
           {
-            validator: (rule, value, callback) => {
+            validator: (rule: any, value: any, callback: any) => {
               if (!value) {
                 return callback(new Error("用户名不能为空"));
               } else if (!/^[a-zA-Z][a-zA-Z0-9]{4,9}$/.test(value)) {
@@ -61,7 +62,7 @@ export default {
       },
     });
 
-    const submitForm = (formName) => {
+    const submitForm = (formName: string) => {
       let params = {
         username: state.loginForm.username,
         password: state.loginForm.password,
@@ -69,7 +70,7 @@ export default {
       userLogin(params)
         .then((res) => {
           if (res.code === 200) {
-            let redirect = decodeURIComponent(router.query.redirect || "/");
+            let redirect = decodeURIComponent(route.query.redirect as string || "/");
             let page = "之前浏览界面";
             if (redirect == "/") {
               page = "主页";
@@ -80,7 +81,9 @@ export default {
               duration: 2500,
             });
 
-            store.dispatch("user/userLogin", res.data.data);
+            store.dispatch("user/userLogin", {
+              userinfo: res.data
+            });
 
             setTimeout(
               () =>

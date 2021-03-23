@@ -1,12 +1,61 @@
+declare interface AdminState {
+    info: {
+        balderich: {
+            total: {
+                cpu: number,
+                ram: number,
+                rom: number,
+                cpus: number,
+                rams: number,
+                roms: number,
+            },
+            serves: BalderichServeInfo[]
+        },
+        anna: {
+            total: {
+                cpu: number,
+                ram: number,
+                rom: number,
+                cpus: number,
+                rams: number,
+                roms: number,
+                dockers: number,
+            },
+            serves: AnnaServeInfo[]
+        }
+    }
+}
+
+declare interface BalderichServeInfo {
+    ip: string,
+    cpu: number,
+    ram: number,
+    rom: number,
+    cpus: string,
+    rams: string,
+    roms: string
+}
+
+declare interface AnnaServeInfo {
+    cpu: number,
+    ram: number,
+    rom: number,
+    cpus: string,
+    rams: string,
+    roms: string,
+    dockers: number,
+}
+
 declare interface UserState {
     isLogin: boolean,
     userinfo: UserInfo,
-    loginDate: Date | undefined
+    loginDate: number | undefined
 }
 
 declare interface UserInfo {
     uid: number,
     username: string | undefined,
+    level: number | undefined,
     avatar: string | undefined,
     token: string | undefined
 }

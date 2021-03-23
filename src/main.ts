@@ -6,11 +6,13 @@ import ElementPlus from "element-plus"
 import 'element-plus/lib/theme-chalk/index.css'
 import HighLight from '@/utils/highlight'
 import i18n from '@/language/il8n'
-import { highlight } from 'prismjs'
+import Title from '@/directives/title'
 
 // import './plugins/element'
 const app = createApp(App)
 app.use(ElementPlus)
 app.use(HighLight)
+app.use(Title)
 app.use(i18n)
 app.use(store).use(router).mount('#app')
+

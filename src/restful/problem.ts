@@ -25,6 +25,21 @@ export const postSubmitFlagById = (id: number, flag: string) => {
 }
 
 export const putProblemLevelById = (id: number, level: number) => {
-    return req.put(`/problem/level/${id}/`, {level: level});
+    return req.put(`/problem/level/${id}/edit/`, {level: level});
 }
 
+export const postOpenDocker = (id: number) => {
+    return req.post(`/problem/docker/${id}/open/`);
+}
+
+export const postCloseDocker = (id: number) => {
+    return req.post(`/problem/docker/${id}/close/`);
+}
+
+export const postDelayDocker = (id: number) => {
+    return req.post(`/problem/docker/${id}/delay/`);
+}
+
+export const getDockerInfo = (id: number) => {
+    return req.get(`/problem/docker/${id}/`);
+}

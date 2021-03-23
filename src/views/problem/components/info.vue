@@ -1,15 +1,19 @@
 <template>
-    <el-row>
+    <el-row v-nss-title="problem.title">
         <el-col :span="1"></el-col>
         <el-col :span="16">
-            <el-tabs v-model="activeName" type="card" @tab-click="handleClick" element-loading-text="加载中...">
+            <el-tabs v-loading="problem.isLoading" v-model="activeName" type="card" @tab-click="handleClick" element-loading-text="加载中...">
                 <el-tab-pane label="题目" name="first">
-                    <el-card class="problem-card" :body-style="{ 'min-height': '500px' }" v-loading="problem.isLoading" element-loading-text="加载中...">
+                    <el-card class="problem-card" :body-style="{ 'min-height': '500px', 'width': '100%' }" v-loading="problem.isLoading" element-loading-text="加载中...">
                         <div class="problem-title">
-                            <p style="font-size: 28px">{{ problem.title }}</p>
+                            <el-badge :value="isSolved ? '已解决' : ''" type="success">
+                                <span style="font-size: 28px">
+                                    {{ problem.title }}
+                                </span>
+                            </el-badge>
                         </div>
                         <div class="problem-body">
-                            <p>题目分数：{{ problem.score }}</p>
+                            <p>题目分数：{{ problem.point }}</p>
                             <p>
                                 题目难度：
                                 <el-rate
@@ -33,19 +37,19 @@
                                 题目描述：
                                 <span>{{ problem.desc }}</span>
                             </p>
-                            <p v-if="problem.hint != false">
+                            <p v-if="problem.hint !== false">
                                 提示：
-                                <el-button v-if="isHinted == false" @click="isDisplayButHintDialog = true">显示提示</el-button>
+                                <el-button v-if="isHinted == false" @click="isDisplayBuyHintDialog = true">显示提示</el-button>
                                 <pre v-else>{{problem.hint}}</pre>
                                 <el-dialog
                                 title="提示"
-                                v-model="isDisplayButHintDialog"
+                                v-model="isDisplayBuyHintDialog"
                                 width="30%"
                                 center>
                                 <span>将花费{{problem.hint_price}}购买本题提示。</span>
                                 <template #footer>
                                     <span class="dialog-footer">
-                                    <el-button @click="isDisplayButHintDialog = false">取 消</el-button>
+                                    <el-button @click="isDisplayBuyHintDialog = false">取 消</el-button>
                                     <el-button type="primary" @click="handleOpenHint">确 定</el-button>
                                     </span>
                                 </template>
@@ -55,17 +59,28 @@
                         </div>
                         <div class="problem-footer">
                             <template v-if="isOpen == false">
-                                <el-button @click="handleOpenDocker">开启环境</el-button>
+                                <el-button @click="handleOpenDocker">开启环境 <i class="el-icon-coin">{{problem.price}}</i></el-button>
                             </template>
-                            <template v-else>
-                                <p>
-                                    <a :href="docker.url" target="blank">{{ docker.url }}</a>
-                                </p>
-                                <el-button @click="handleCloseDocker">关闭环境</el-button>
-                                <el-button @click="handleDelayDocker">延长时间</el-button>
+                            <template v-else-if="noDocker == false">
+                                <div v-loading="isOpenAndLoading">
+                                    <p>
+                                        <a :href="docker.url" target="blank">{{ docker.url }}</a>
+                                    </p>
+                                    <el-row style="margin-bottom: 10px">
+                                        <el-col :span="8"></el-col>
+                                        <el-col :span="8">
+                                    <el-progress :percentage="dockerRemainPercentage" :format="()=>{return `剩余：${docker.remain}秒`}">
+                                    </el-progress>
+                                </el-col>
+                                    </el-row>
+                                    <el-button @click="handleCloseDocker">关闭环境</el-button>
+                                    <el-button @click="handleDelayDocker">延长时间</el-button>
+                                </div>
                             </template>
-                            <el-button v-if="problem.annex != false">附件下载</el-button>
-                            <div class="problem-flag">
+                            <el-button v-if="problem.annex != null">
+                                <el-link :href="problem.annex" target="_blank">附件下载</el-link>
+                                </el-button>
+                            <div class="problem-flag" v-if="isOpen">
                                 <template v-if="isSolved == false">
                                     <el-input v-model="flag" placeholder="flag"></el-input>
                                     <el-button @click="submitFlag()" style="margin-top: 12px">提交</el-button>
@@ -116,7 +131,7 @@
                 </template>
                 <router-link :to="'/user/' + problem.uid">{{problem.author}}</router-link>
             </el-card>
-            <el-card style="margin-top: 30px;">
+            <el-card style="margin-top: 30px;" v-if="isSolved">
             <el-collapse>
                 <el-collapse-item title="我的评价">
                     <p>难度评分：<el-rate v-model="myInfo.level" @change="handleMyInfoLevelChange" allow-half show-score style="display: inline"></el-rate></p>
@@ -127,10 +142,9 @@
     </el-row>
 </template>
 <script lang="ts">
-import { inject, onMounted, reactive, toRefs } from "vue";
+import { computed, inject, onMounted, reactive, toRefs } from "vue";
 import { useRoute } from 'vue-router'
-import { getMyRateInfoById, getProblemInfoById,postOpenHintById,postSubmitFlagById,putProblemLevelById } from '@/restful/problem'
-import { getDockerInfoById } from '@/restful/docker'
+import { getMyRateInfoById, getProblemInfoById,postOpenDocker,postOpenHintById,postSubmitFlagById,putProblemLevelById,getDockerInfo, postCloseDocker, postDelayDocker } from '@/restful/problem'
 import Notification from '@/utils/notification'
 import problem from '@/mock/problem'
 
@@ -147,12 +161,13 @@ export default {
                 title: '',
                 desc: '',
                 uid: 0,
-                score: 500,
                 author: '',
+                point: 0,
                 hint: false as boolean | string,
                 hint_price: 0,
+                price: 0,
                 tag: [] as string[],
-                annex: false,
+                annex: null,
                 level: 0,
                 isLoading: true
             },
@@ -163,7 +178,8 @@ export default {
             },
             docker: {
                 url: 'http://docker.ctfer.vip/asd',
-                remain: 0
+                createDate: 1615863892443,
+                remain: 10,
             },
             myInfo: {
                 level: 0,
@@ -175,10 +191,12 @@ export default {
             isOpen: true,
             isSolved: false,
             isHinted: false,
-            isDisplayButHintDialog: false
+            isOpenAndLoading: false,
+            isDisplayBuyHintDialog: false,
+            noDocker: false,
         });
 
-        onMounted(() => {
+        const loadChart = () => {
             let myChart = echarts.init(document.getElementById("solveInfo"));
             // 绘制图表
             myChart.setOption({
@@ -209,6 +227,12 @@ export default {
             window.onresize = function() {//自适应大小
                 myChart.resize();
             }
+        };
+
+        const dockerRemainPercentage = computed(() => {
+            let now = new Date().getTime();
+            
+            return Math.round(((now - state.docker.createDate)/(now + state.docker.remain*1000 - state.docker.createDate)) * 100);
         })
 
         const getMyRateInfo = () => {
@@ -226,8 +250,6 @@ export default {
 
         getProblemInfoById(id).then(res => {
             if (res.code == 200) {
-                state.problem.isLoading = false;
-
                 state.problem.title = res.data.title;
                 state.problem.desc = res.data.desc;
                 state.problem.hint = res.data.hint;
@@ -237,6 +259,7 @@ export default {
                 state.problem.author = res.data.author;
                 state.problem.tag = res.data.tag;
                 state.problem.annex = res.data.annex;
+                state.problem.point = res.data.point;
                 state.isHinted = res.data.is_hinted;
                 state.isSolved = res.data.is_solved;
                 state.isOpen = res.data.is_open;
@@ -251,6 +274,8 @@ export default {
                 if (res.data.is_hinted) {
                     state.problem.hint = res.data.hint
                 }
+                loadChart();
+                state.problem.isLoading = false;
             } else {
                 Notification.error({
                     message: '题目数据获取失败！'
@@ -258,13 +283,9 @@ export default {
             }
 
             if (res.data.is_open) {
-                getDockerInfoById(res.data.did).then(res => {
-                    state.docker.url = res.data.url;
-                    state.docker.remain = res.data.remain;
-                })
+                loadDockerInfo()
             }
         })
-        state.problem = problem;
 
 
         const handleClick = (tab: any, event: any) => {
@@ -272,7 +293,7 @@ export default {
         }
 
         const handleOpenHint = () => {
-            state.isDisplayButHintDialog = false;
+            state.isDisplayBuyHintDialog = false;
             postOpenHintById(id).then(res => {
                 if (res.code === 200) {
                     state.isHinted = true;
@@ -309,16 +330,71 @@ export default {
             }
         }
 
-        const handleOpenDocker = () => {
+        const loadDockerInfo = async () => {
+            let res = await getDockerInfo(id);
+            if (res.code == 200) {
+                state.docker.url = res.data.url;
+                state.docker.remain = res.data.timeout;
+                state.docker.createDate = res.data.create_date;
 
+                let h = () => {
+                    if (state.docker.remain > 0) {
+                        state.docker.remain -= 1;
+                        setTimeout(h, 1000);
+                    }
+                };
+                h();
+
+                return true;
+            } else if (res.code == 202) {
+                state.noDocker = true;
+                return true;
+            }
+            return false;
+        }
+
+        const handleOpenDocker = () => {
+            postOpenDocker(id).then(res => {
+                if (res.code == 200) {
+                    state.isOpen = true;
+                    state.isOpenAndLoading = true;
+
+                    let func = () => {
+                        if (!loadDockerInfo()) {
+                            setTimeout(func, 1500)
+                        }
+                    }
+                    func()
+                }
+            })
         }
 
         const handleCloseDocker = () => {
-
+            postCloseDocker(id).then(res => {
+                if (res.code == 200) {
+                    state.isOpen = false;
+                    state.isOpenAndLoading = false;
+                    Notification.info({
+                        message: '关闭docker成功'
+                    })
+                }
+            })
         }
 
         const handleDelayDocker = () => {
-
+            if (state.docker.remain < 60*5) {
+                Notification.warning({
+                    message: "剩余时长小于5分钟，无法延时！"
+                })
+            } else {
+                postDelayDocker(id).then(res => {
+                    if (res.code == 200) {
+                        Notification.info({
+                            message: '延长时间成功'
+                        })
+                    }
+                })
+            }
         }
 
         return {
@@ -329,6 +405,8 @@ export default {
             submitFlag,
             handleMyInfoLevelChange,
             
+            dockerRemainPercentage,
+
             handleOpenDocker,
             handleCloseDocker,
             handleDelayDocker,

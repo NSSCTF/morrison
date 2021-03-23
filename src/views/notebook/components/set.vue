@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-nss-title="'文章列表'">
     <el-row>
       <el-col>
         <div class="scaleProgress">
@@ -176,7 +176,7 @@
   </div>
 </template>
 
-<script>
+<script lang="js">
 import { reactive, toRefs,onMounted, computed } from "vue";
 import * as CD from "../../../mock/comment.js";
 import selfArticle from "./article";
@@ -185,6 +185,7 @@ import {
   getSetById,
   getCategoryByIdAndSubId,
   getNoteListBySetIdAndTypeId,
+  getContentFromUrl,
 } from "@/restful/note";
 import { useRoute } from "vue-router";
 import { mapGetters, useStore } from "vuex"
@@ -268,14 +269,15 @@ export default {
     const displayArticle = (id) => {
       state.displayId = 3;
       state.articleData.isLoading = true;
-      getNoteById(parseInt(id)).then((res) => {
+      getNoteById(parseInt(id)).then(async (res) => {
+        let content = await getContentFromUrl(res.data.content_url);
         state.articleData = {
           id: res.data.id,
           title: res.data.title,
           author_id: res.data.uid,
           author: res.data.author,
           tags: res.data.tag.split("|"),
-          content: res.data.content,
+          content: content,
           views: res.data.info.views,
           likes: res.data.info.likes,
           isLike: res.data.like,

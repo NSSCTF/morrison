@@ -14,7 +14,7 @@
                             <span>参赛方式：<el-tag size="small">{{item.is_team ? '组队' : '个人'}}</el-tag></span>
                             <span style="padding-left: 10%">时间：{{contestDateFormat(item.start_date)}} - {{contestDateFormat(item.ends_date)}}</span>
                         </p>
-                        <p>{{item.desc}}</p>
+                        <p class="contest-desc">{{item.desc}}</p>
                     </div>
                     <div class="contest-button">
                         <router-link :to="`/contest/${item.id}/`"><el-button>进入</el-button></router-link>
@@ -41,7 +41,7 @@ export default {
                 start_date: 1614315595770,
                 ends_date: 1614345595770,
                 is_team: false,
-                desc: '笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记...',
+                desc: '记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记...',
                 state: 0,
                 my_state: 0,
             }] as any[],
@@ -130,6 +130,14 @@ export default {
 
 .contest-header {
     font-size: 28px;
+}
+
+.contest-desc {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .el-button {
