@@ -10,7 +10,10 @@ export default {
     setup() {
         const store = useStore();
         const router = useRouter();
-        console.log(1)
+        let ex = new Date();
+        ex.setDate(ex.getDate()-1);
+        // console.log(userinfo, document)
+        document.cookie = `token=; expires=${ex.toUTCString()}; path=/`;
         sessionStorage.removeItem('user_state');
         store.dispatch('user/userLogout');
         Notification.success({

@@ -43,3 +43,7 @@ export const postDelayDocker = (id: number) => {
 export const getDockerInfo = (id: number) => {
     return req.get(`/problem/docker/${id}/`);
 }
+
+export const putProblemLikeState = (id: number, state: boolean) => {
+    return req.put(`/problem/like/${id}/`, {state: state});
+}

@@ -32,7 +32,7 @@ const createNotification = (config: configType) => {
         message: config.message,
         duration: config.duration || 4000,
         position: config.postion || "top-right",
-        offset: config.offset || 0
+        offset: config.offset || 100
     };
 
     if (config.isHtml) {

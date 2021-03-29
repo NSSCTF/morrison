@@ -49,6 +49,7 @@
           <template #default="scope">
             <i
               :class="scope.row.isLike ? 'el-icon-star-on' : 'el-icon-star-off'"
+              @click="changeLikeState(scope.row.id, scope.row.isLike)"
             >{{ scope.row.likes }}</i>
           </template>
         </el-table-column>
@@ -67,9 +68,12 @@
 </template>
 
 <script lang="ts">
+import { putProblemLikeState } from '@/restful/problem';
 import { computed, reactive, toRefs } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
+import Notification from '@/utils/notification'
+
 export default {
   setup() {
     const router = useRouter();
@@ -101,17 +105,42 @@ export default {
       return row.isLike === value;
     }
     store.dispatch('problem/setTableDataByType', { type: type }).then(() => {
+      state.dataTotal = store.getters['problem/getTableDataByType'](type).length;
       state.isLoading = false;
     })
 
     const tableRowClassName = ({ row, rowIndex }: any) => {
-      console.log(row)
       if (row.state == 1) {
         return 'warning-row';
       } else if (row.state == 2){
         return 'success-row';
       }
       return '';
+    }
+
+    const changeLikeState = (pid: number, state: boolean) => {
+      putProblemLikeState(pid, !state).then((res: any) => {
+        if (res.code == 200) {
+          if (res.data.state) {
+            Notification.info({
+              message: "收藏题目成功。"
+            });
+          } else {
+            Notification.info({
+              message: "取消收藏成功。"
+            })
+          }
+          store.dispatch('problem/setTableDataByType', { type: type });
+        } else if (res.code == 403) {
+          Notification.info({
+            message: "请先登录！"
+          });
+          router.push({
+            path: '/user/login',
+            query: {redirect: route.path}
+          });
+        }
+      })
     }
 
     return {
@@ -122,7 +151,8 @@ export default {
 
       toPage,
       goBack,
-      filterLike
+      filterLike,
+      changeLikeState
     }
   }
 };

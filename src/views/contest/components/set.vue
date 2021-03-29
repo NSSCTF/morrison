@@ -1,7 +1,7 @@
 <template>
     <el-row>
         <el-col :span="4"></el-col>
-        <el-col :span="16">
+        <el-col :span="16" v-loading="isLoading" element-loading-text="加载中...">
             <span>
             <el-pagination background layout="prev, pager, next" :total="dataTotal" :page-size="4" v-model:current-page="currentPage"></el-pagination>
             </span>
@@ -19,6 +19,11 @@
                     <div class="contest-button">
                         <router-link :to="`/contest/${item.id}/`"><el-button>进入</el-button></router-link>
                         <el-button :disabled="item.state != 1" :type="item.my_state ? 'success' : ['', 'primary', 'warning', 'info'][item.state]" >{{item.my_state ? '已报名' : ['准备中', '可报名', '比赛中', '已结束'][item.state]}}</el-button>
+                    </div>
+                </li>
+                <li v-if="filterData.length == 0">
+                    <div style="text-align: center;width: 100%;">
+                        <p style="font-size: 48px;color: rgba(71, 65, 65, 0.555)">No Data Here.</p>
                     </div>
                 </li>
             </ul>
@@ -47,16 +52,18 @@ export default {
             }] as any[],
             allData: [],
 
+            isLoading: true,
             dataTotal: 10,
             currentPage: 1
         });
 
         getAllContestInfo().then(res => {
             if (res.code == 200) {
-                state.allData = res.data.info;
-                state.filterData = res.data.info;
-                state.dataTotal = res.data.info.length();
+                state.allData = res.data;
+                state.filterData = res.data;
+                state.dataTotal = res.data.length;
                 changePage(state.currentPage);
+                state.isLoading = false;
             }
         })
 
@@ -67,7 +74,7 @@ export default {
         watch(
             () => state.currentPage,
             (page) => {
-                // changePage(page)
+                changePage(page)
             } 
         )
 
@@ -75,7 +82,7 @@ export default {
             let date = new Date(value);
             const year = date.getFullYear();
             const month = date.getMonth();
-            const day = date.getDay();
+            const day = date.getDate();
             
             const hour = date.getHours()
             const minute = date.getMinutes();
@@ -100,7 +107,7 @@ export default {
 }
 
 .contest-list li {
-    border: solid 1px grey;
+    border: solid 1px gray;
     border-radius: 5px;
     height: 160px;
     display: flex;

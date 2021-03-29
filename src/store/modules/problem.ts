@@ -41,7 +41,7 @@ const actions = {
             type: type,
             data: res.data
         });
-    }
+    },
 }
 
 const mutations = {

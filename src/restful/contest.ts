@@ -15,3 +15,11 @@ export const getContestProblemInfoByCidAndId = (cid: number, id: number) => {
 export const getContestInfoById = (cid: number) => {
     return req.get(`/contest/${cid}/info/`);
 }
+
+export const getContestRankListByCid = (cid: number) => {
+    return req.get(`/contest/${cid}/rank/`);
+}
+
+export const postContestProblemFlag = (cid: number, cpid: number, flag: string) => {
+    return req.post(`/contest/${cid}/problem/${cpid}/submit/`, {flag: flag});
+}
