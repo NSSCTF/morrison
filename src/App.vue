@@ -15,11 +15,13 @@
         <navbar />
       </el-header>
       <el-main style="overflow: visible;">
-        <router-view />
+        <div style="min-height: 87%">
+          <router-view />
+        </div>
+        <div style="height: 80px;bottom: 0">
+          <selfFooter />
+        </div>
       </el-main>
-      <!-- <el-footer>
-        <selfFooter />
-      </el-footer> -->
     </el-container>
   </div>
 </template>
@@ -32,10 +34,12 @@ import { useStore } from 'vuex'
 import { computed, onMounted, provide, reactive, toRefs } from 'vue'
 import Notify from '@/utils/notification'
 import * as echarts from 'echarts'
+import selfFooter from '@/components/Footer.vue'
 
 export default {
   components: {
-    navbar
+    navbar,
+    selfFooter
   },
   setup() {
     const router = useRouter();

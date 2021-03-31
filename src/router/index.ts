@@ -115,6 +115,18 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/rank',
+    name: 'rank',
+    component: () => import('@/views/rank/index.vue'),
+    children: [
+      {
+        path: '',
+        name: 'rankHome',
+        component: () => import('@/views/rank/components/rank.vue')
+      }
+    ]
+  },
+  {
     path: '/admin',
     name: 'admin',
     component: () => import('@/views/admin/index.vue'),

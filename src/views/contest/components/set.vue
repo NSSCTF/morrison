@@ -3,22 +3,40 @@
         <el-col :span="4"></el-col>
         <el-col :span="16" v-loading="isLoading" element-loading-text="加载中...">
             <span>
-            <el-pagination background layout="prev, pager, next" :total="dataTotal" :page-size="4" v-model:current-page="currentPage"></el-pagination>
+                <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    :total="dataTotal"
+                    :page-size="4"
+                    v-model:current-page="currentPage"
+                ></el-pagination>
             </span>
             <ul class="contest-list">
-                <li v-for="(item, index) in filterData.slice((currentPage-1)*4, currentPage*4)" :key="index">
+                <li
+                    v-for="(item, index) in filterData.slice((currentPage-1)*4, currentPage*4)"
+                    :key="index"
+                >
                     <img src="base://Q" />
                     <div class="contest-info">
-                        <span class="contest-header">{{item.title}}</span>
+                        <span class="contest-header">{{ item.title }}</span>
                         <p>
-                            <span>参赛方式：<el-tag size="small">{{item.is_team ? '组队' : '个人'}}</el-tag></span>
-                            <span style="padding-left: 10%">时间：{{contestDateFormat(item.start_date)}} - {{contestDateFormat(item.ends_date)}}</span>
+                            <span>
+                                参赛方式：
+                                <el-tag size="small">{{ item.is_team ? '组队' : '个人' }}</el-tag>
+                            </span>
+                            <span
+                                style="padding-left: 10%"
+                            >时间：{{ contestDateFormat(item.start_date) }} - {{ contestDateFormat(item.ends_date) }}</span>
                         </p>
-                        <p class="contest-desc">{{item.desc}}</p>
+                        <p class="contest-desc">{{ item.desc }}</p>
                     </div>
                     <div class="contest-button">
-                        <router-link :to="`/contest/${item.id}/`"><el-button>进入</el-button></router-link>
-                        <el-button :disabled="item.state != 1" :type="item.my_state ? 'success' : ['', 'primary', 'warning', 'info'][item.state]" >{{item.my_state ? '已报名' : ['准备中', '可报名', '比赛中', '已结束'][item.state]}}</el-button>
+                        <router-link :to="`/contest/${item.id}/`">
+                            <el-button
+                            :type="['primary', 'warning', 'info'][item.state]"
+                        >{{ ['未开始', '比赛中', '已结束'][item.state] }}</el-button>
+                        </router-link>
+                        
                     </div>
                 </li>
                 <li v-if="filterData.length == 0">
@@ -34,7 +52,7 @@
 
 <script lang="ts">
 import { reactive, toRefs, watch } from "vue";
-import { getAllContestInfo } from '@/restful/contest'
+import { getAllContestInfo} from '@/restful/contest'
 
 export default {
     setup() {
@@ -47,14 +65,15 @@ export default {
                 ends_date: 1614345595770,
                 is_team: false,
                 desc: '记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记笔记...',
-                state: 0,
-                my_state: 0,
+                state: 0, // 未开始，比赛中，已结束
             }] as any[],
             allData: [],
 
-            isLoading: true,
+            isLoading: false,
             dataTotal: 10,
-            currentPage: 1
+            currentPage: 1,
+            displayRegisterDialog: false,
+            selectIndex: 0,
         });
 
         getAllContestInfo().then(res => {
@@ -68,14 +87,14 @@ export default {
         })
 
         const changePage = (page: number) => {
-            state.contestData = state.filterData.slice((page-1)*4, page*4);
+            state.contestData = state.filterData.slice((page - 1) * 4, page * 4);
         }
 
         watch(
             () => state.currentPage,
             (page) => {
                 changePage(page)
-            } 
+            }
         )
 
         const contestDateFormat = (value: number) => {
@@ -83,10 +102,10 @@ export default {
             const year = date.getFullYear();
             const month = date.getMonth();
             const day = date.getDate();
-            
+
             const hour = date.getHours()
             const minute = date.getMinutes();
-            return `${year}-${month < 10 ? '0'+month : month}-${day < 10 ? '0'+day : day} ${hour < 10 ? '0'+hour : hour}:${minute < 10 ? '0'+minute : minute}`
+            return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day} ${hour < 10 ? '0' + hour : hour}:${minute < 10 ? '0' + minute : minute}`
         }
 
         return {

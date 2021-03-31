@@ -1,7 +1,8 @@
 import Axios from 'axios'
+import {BALDERICH_URL} from '@/config'
 
 const instance = Axios.create({
-    baseURL: 'http://localhost:9000/',
+    baseURL: BALDERICH_URL,
     timeout: 30000,
     withCredentials: true,
 })

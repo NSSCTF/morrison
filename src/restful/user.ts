@@ -23,3 +23,7 @@ export const postRegisterSendVerifyCode = (data: Object) => {
 export const postUploadUserAvater = (form: any) => {
     return req.post('/user/avatar/update/', form);
 }
+
+export const getUserRankListByPage = (page: number=1) => {
+    return req.get(`/user/ranklist/${page}/`);
+}

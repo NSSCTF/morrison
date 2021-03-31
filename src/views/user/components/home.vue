@@ -132,7 +132,18 @@
                                     <el-switch active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                                 </span>
                             </li>
+                            <li>
+                                <span>更改个人简介</span>
+                                <span>
+                                    <el-input size="mini" style="width: 100%"></el-input>
+                                </span>
+                            </li>
                         </ul>
+                        <div>
+                            <el-button type="primary">
+                                提交
+                            </el-button>
+                        </div>
                     </div>
                 </el-col>
                 <el-col :span="6">
@@ -174,6 +185,7 @@ import { useStore } from 'vuex'
 import { inject, onMounted, reactive, toRefs, watch } from 'vue';
 import { AVATAR_UPLOAD_URL } from '@/config'
 import Notification from '@/utils/notification'
+import '@/utils/format'
 
 export default {
     setup() {
@@ -202,7 +214,7 @@ export default {
             userNavActiveId: 1,
 
             isLoading: true,
-            isMySelfSpace: false,
+            isMySelfSpace: true,
             uploadAvatarDialogVisible: false,
             uploadAvatarUrl: undefined,
             AVATAR_UPLOAD_URL: AVATAR_UPLOAD_URL,
@@ -246,7 +258,7 @@ export default {
                 state.bio = res.data.bio;
                 state.username = res.data.username;
                 state.avatar = res.data.avatar;
-                state.registerDate = new Date(res.data.register_date).toLocaleString();
+                state.registerDate = new Date(res.data.register_date).format('yyyy-MM-dd');
                 state.lastLoginDate = lastLoginDateFormat(res.data.last_login_date);
                 state.email = res.data.email ? res.data.email : '未公开';
 
@@ -417,17 +429,25 @@ export default {
 .user-setting {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin-top: 0;
     font-size: 18px;
     position: relative;
 }
 
 .user-setting li {
     display: flex;
+    vertical-align: middle;
+    padding-top: 10px;
     justify-content: space-between;
 }
 
-.user-setting li span {
+.user-setting li span:first {
+    width: 15%;
+}
+
+.user-setting li span:last-of-type {
+    width: 85%;
+    text-align: right;
 }
 
 .user-nav .left li {

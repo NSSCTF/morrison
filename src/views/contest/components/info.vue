@@ -149,7 +149,7 @@ export default {
                 desc: '',
             },
             notice: [],
-            rankList: [{ name: "Xenny", solved: [1], solve: 10, score: 13202 }, { name: "Xenny", solved: [], solve: 10, score: 13202 }],
+            rankList: [{ name: "Xenny", solved: [1], solve: 10, score: 13202, time: 0}, { name: "Xenny", solved: [], solve: 10, score: 13202, time: 1}],
             problemList: [] as any[],
             problem: {
                 0: {
@@ -247,6 +247,12 @@ export default {
                 getContestRankListByCid(cid).then(res => {
                     if (res.code == 200) {
                         state.rankList = res.data;
+                        state.rankList = state.rankList.sort((a, b) => {
+                            if (a.score == b.score) {
+                                return a.time > b.time ? 1 : -1;
+                            }
+                            return a.score > b.score ? -1 : 1;
+                        })
                         state.randLoading = false;
                     }
                 })
