@@ -1,43 +1,35 @@
-import { getProblemByTypeAndPage,getProblemByType } from "@/restful/problem";
+import { getProblemBySourceAndTypeAndPage,getProblemBySourceAndType } from "@/restful/problem";
 
 const state = () => ({
-    tableData: {
-        web: {all: [{
-            id: 1,
-            title: 'test',
-            author: 'admin',
-            uid: 1,
-            tag: ['123','sql','ad','aaa'],
-            likes: 1,
-            isLike: false,
-        }]},
-        pwn: {all: []},
-        crypto: {all: []},
-        reverse: {all: []},
-        misc: {all: []}
-    },
+    tableData: {},
 })
 
 const getters = {
-    getTableDataByTypeAndPage: (state: ProblemState) => (type: ProblemType) => (page: number) => {
-        return state.tableData[type][page];
+    getTableDataBySourceAndTypeAndPage: (state: ProblemState) => (source: number, type: number) => (page: number) => {
+        return state.tableData[source][type][page];
     },
-    getTableDataByType: (state: ProblemState) => (type: ProblemType) => {
-        return state.tableData[type].all;
+    getTableDataBySourceAndType: (state: ProblemState) => (source: number, type: number) => {
+        return state.tableData[source][type].all;
     }
 }
 
 const actions = {
-    async setTableDataByTypeAndPage ({commit, state}: {commit: any, state: ProblemState}, {type, page}: {type: ProblemType, page: number}) {
-        let res = await getProblemByTypeAndPage(type, page);
-        commit('setTableDataByTypeAndPage', {
+    async setTableDataBySourceAndTypeAndPage ({commit, state}: {commit: any, state: ProblemState}, {source, type, page}: {source: number, type: number, page: number}) {
+        let res = await getProblemBySourceAndTypeAndPage(source, type, page);
+        commit('setTableDataBySourceAndTypeAndPage', {
+            source: source,
             type: type,
             data: res.data
         });
     },
-    async setTableDataByType ({commit}: {commit: any}, {type}: {type: ProblemType}) {
-        let res = await getProblemByType(type);
-        commit('setTableDataByType', {
+    async setTableDataBySourceAndType ({commit, state}: {commit: any, state: ProblemState}, {source, type}: {source: number, type: number}) {
+        if (state.tableData[source] &&
+            state.tableData[source][type]) {
+                return false;
+            }
+        let res = await getProblemBySourceAndType(source, type);
+        commit('setTableDataBySourceAndType', {
+            source: source,
             type: type,
             data: res.data
         });
@@ -45,11 +37,24 @@ const actions = {
 }
 
 const mutations = {
-    setTableDataByTypeAndPage (state: ProblemState, {type, page, data}: {type: ProblemType, page: number, data: ProblemData[]}) {
-        state.tableData[type][page] = data;
+    setTableDataBySourceAndTypeAndPage (state: ProblemState, {source, type, page, data}: {source: number, type: number, page: number, data: ProblemData[]}) {
+        if (!state.tableData[source]) {
+            state.tableData[source] = {}
+        }
+        if (!state.tableData[source][type]) {
+            state.tableData[source][type] = {}
+        }
+        state.tableData[source][type][page] = data;
     },
-    setTableDataByType (state: ProblemState, {type, data}: {type: ProblemType, data: ProblemData[]}) {
-        state.tableData[type].all = data;
+    setTableDataBySourceAndType (state: ProblemState, {source, type, data}: {source: number, type: number, data: ProblemData[]}) {
+        console.log(source, typeof source)
+        if (!state.tableData[source]) {
+            state.tableData[source] = {}
+        }
+        if (!state.tableData[source][type]) {
+            state.tableData[source][type] = {}
+        }
+        state.tableData[source][type].all = data;
     }
 }
 

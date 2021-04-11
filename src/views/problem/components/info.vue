@@ -188,10 +188,10 @@ export default {
             solveData: [],
             wpData: [],
 
-            isOpen: true,
+            isOpen: false,
             isSolved: false,
             isHinted: false,
-            isOpenAndLoading: false,
+            isOpenAndLoading: true,
             isDisplayBuyHintDialog: false,
             noDocker: false,
         });
@@ -332,18 +332,24 @@ export default {
 
         const loadDockerInfo = async () => {
             let res = await getDockerInfo(id);
+            
             if (res.code == 200) {
-                state.docker.url = res.data.url;
-                state.docker.remain = res.data.timeout;
-                state.docker.createDate = res.data.create_date;
+                if (res.data.state == false) {
+                    setTimeout(loadDockerInfo, 2000)
+                } else {
+                    state.isOpenAndLoading = false;
+                    state.docker.url = res.data.url;
+                    state.docker.remain = res.data.timeout;
+                    state.docker.createDate = res.data.create_date;
 
-                let h = () => {
-                    if (state.docker.remain > 0) {
-                        state.docker.remain -= 1;
-                        setTimeout(h, 1000);
-                    }
-                };
-                h();
+                    let h = () => {
+                        if (state.docker.remain > 0) {
+                            state.docker.remain -= 1;
+                            setTimeout(h, 1000);
+                        }
+                    };
+                    h();
+                }
 
                 return true;
             } else if (res.code == 202) {
@@ -361,7 +367,7 @@ export default {
 
                     let func = () => {
                         if (!loadDockerInfo()) {
-                            setTimeout(func, 1500)
+                            setTimeout(func, 2000)
                         }
                     }
                     func()

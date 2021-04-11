@@ -107,8 +107,6 @@ declare interface NoteState {
     }
 }
 
-declare type ProblemType = 'web' | 'pwn' | 'crypto' | 'reverse' | 'misc';
-
 declare interface ProblemData {
     id: number,
     title: string,
@@ -122,26 +120,11 @@ declare interface ProblemData {
 }
 
 declare interface ProblemState {
-    tableData: {
-        web: {
-            all: ProblemData[]
-            [index: number]: ProblemData[]
-        },
-        pwn: {
-            all: ProblemData[]
-            [index: number]: ProblemData[]
-        },
-        crypto: {
-            all: ProblemData[]
-            [index: number]: ProblemData[]
-        },
-        reverse: {
-            all: ProblemData[]
-            [index: number]: ProblemData[]
-        },
-        misc: {
-            all: ProblemData[]
-            [index: number]: ProblemData[]
-        }
-    },
+    tableData: any
+    // {
+    //     [number]: {
+    //         all: ProblemData[]
+    //         [index: number]: ProblemData[]
+    //     },
+    // },
 }

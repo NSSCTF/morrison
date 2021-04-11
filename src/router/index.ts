@@ -16,6 +16,11 @@ const routes: Array<RouteRecordRaw> = [
     component: Home
   },
   {
+    path: '/first',
+    name: 'firstPage',
+    component: () => import('@/components/First.vue')
+  },
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting
@@ -80,13 +85,13 @@ const routes: Array<RouteRecordRaw> = [
     name: 'problem',
     component: () => import('@/views/problem/index.vue'),
     children: [
+      // {
+      //   path: '',
+      //   name: 'problemHomePage',
+      //   component: () => import('@/views/problem/components/home.vue')
+      // },
       {
         path: '',
-        name: 'problemHomePage',
-        component: () => import('@/views/problem/components/home.vue')
-      },
-      {
-        path: 'set/:type',
         name: 'problemSet',
         component: () => import('@/views/problem/components/set.vue')
       },

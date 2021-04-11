@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" v-if="!isFirst">
     <!-- <el-row>
       <el-col :span="24">
       
@@ -24,6 +24,9 @@
       </el-main>
     </el-container>
   </div>
+  <template v-else>
+    <router-view />
+  </template>
 </template>
 
 <script lang="ts">
@@ -31,7 +34,7 @@ import navbar from '@/components/Navbar.vue'
 // import selfFooter from '@/components/Footer'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { computed, onMounted, provide, reactive, toRefs } from 'vue'
+import { computed, onMounted, provide, reactive, toRefs, ref } from 'vue'
 import Notify from '@/utils/notification'
 import * as echarts from 'echarts'
 import selfFooter from '@/components/Footer.vue'
@@ -46,7 +49,7 @@ export default {
     const store = useStore();
 
     const isLogin = store.getters['user/isLogin'];
-
+    const isFirst = ref(true);
     provide('ec', echarts);
 
     onMounted(() => {
@@ -54,6 +57,17 @@ export default {
     })
     const saveState = () => {
       sessionStorage.setItem('user_state', JSON.stringify(store.state.user))
+    }
+
+    if (localStorage.getItem('isFirst') === 'ped') {
+      localStorage.setItem('isFirst', 'no')
+      location.reload();
+    } else if (localStorage.getItem('isFirst') !== 'no') {
+      router.push({
+        path: '/first',
+      })
+    } else {
+      isFirst.value = false;
     }
 
     router.beforeEach((to, from, next) => {
@@ -78,6 +92,10 @@ export default {
         next();
       }
     });
+
+    return {
+      isFirst
+    }
   }
 }
 </script>

@@ -86,17 +86,23 @@
                     <el-form-item label="静态Flag" v-if="problem.flagType == 1">
                         <el-input v-model="problem.staticflag" maxlength="127" show-word-limit></el-input>
                     </el-form-item>
+                    <el-form-item label="题目来源">
+                        <el-radio-group v-model="problem.source">
+                            <el-radio :label="1">NSSCTF</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
                     <el-form-item label="题目类型">
                         <el-radio-group v-model="problem.type">
-                            <el-radio :label="0">WEB</el-radio>
-                            <el-radio :label="1">RE</el-radio>
+                            <el-radio :label="1">WEB</el-radio>
                             <el-radio :label="2">PWN</el-radio>
-                            <el-radio :label="3">CRYPTO</el-radio>
-                            <el-radio :label="4">MISC</el-radio>
-                            <el-radio :label="5">AI</el-radio>
-                            <el-radio :label="6">IOT</el-radio>
-                            <el-radio :label="7">EGG</el-radio>
-                            <el-radio :label="8">ETH</el-radio>
+                            <el-radio :label="3">REVERSE</el-radio>
+                            <el-radio :label="4">CRYPTO</el-radio>
+                            <el-radio :label="5">MISC</el-radio>
+                            <el-radio :label="6">ANDROID</el-radio>
+                            <el-radio :label="7">ETH</el-radio>
+                            <el-radio :label="8">IOT</el-radio>
+                            <el-radio :label="9">AI</el-radio>
+                            <el-radio :label="10">EGG</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="题目简介">
@@ -129,9 +135,10 @@ export default {
                 title: '',
                 desc: '',
                 point: 500,
-                docker: '',
+                source: 1,
+                docker: 1,
                 price: 0,
-                type: 0,
+                type: 1,
                 pointType: 0,
                 flagType: 0,
                 staticflag: '',

@@ -1,11 +1,11 @@
 import req from './api'
 
-export const getProblemByTypeAndPage = (type: string, page: number) => {
-    return req.get(`/problem/set/${type}/${page}/`);
+export const getProblemBySourceAndTypeAndPage = (source: number, type: number, page: number) => {
+    return req.get(`/problem/set/${source}/${type}/${page}/`);
 }
 
-export const getProblemByType = (type: string) => {
-    return req.get(`/problem/set/${type}/`);
+export const getProblemBySourceAndType = (source: number, type: number) => {
+    return req.get(`/problem/set/${source}/${type}/`);
 }
 
 export const getProblemInfoById = (id: number) => {

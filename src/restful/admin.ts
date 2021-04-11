@@ -4,12 +4,8 @@ export const postAddProblem = (problem: object) => {
     return req.post(`/problem/add/`, {...problem});
 }
 
-export const getProblemByPage = (page: number, size: number=20) => {
-    return req.get(`/problem/info/bypage/${page}/${size}/`);
-}
-
-export const getProblemTotal = () => {
-    return req.get('/problem/total/');
+export const getAllProblem = () => {
+    return req.get(`/problem/all/`);
 }
 
 export const postQueryDockerName = (name: string) => {
