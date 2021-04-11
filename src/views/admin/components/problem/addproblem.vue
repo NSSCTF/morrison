@@ -9,6 +9,12 @@
                     <el-form-item label="题目名" style="width: 30rem">
                         <el-input v-model="problem.title" maxlength="63" show-word-limit></el-input>
                     </el-form-item>
+                    <el-form-item label="转发类型">
+                        <el-radio-group v-model="problem.redirectType">
+                            <el-radio :label="0">TCP，UDP端口转发</el-radio>
+                            <el-radio :label="1">HTTP子域名转发</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
                     <el-form-item label="镜像名" style="width: 30rem">
                         <el-autocomplete
                             style="width: 100%"
@@ -142,6 +148,7 @@ export default {
                 pointType: 0,
                 flagType: 0,
                 staticflag: '',
+                redirectType: 0,
                 hintType: false,
                 hintPrice: 0,
                 hint: '',

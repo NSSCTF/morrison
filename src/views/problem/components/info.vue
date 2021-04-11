@@ -64,7 +64,7 @@
                             <template v-else-if="noDocker == false">
                                 <div v-loading="isOpenAndLoading">
                                     <p>
-                                        <a :href="docker.url" target="blank">{{ docker.url }}</a>
+                                        <a :href="`http://${docker.url}/`" target="blank">{{ `http://${docker.url}/` }}</a>
                                     </p>
                                     <el-row style="margin-bottom: 10px">
                                         <el-col :span="8"></el-col>
@@ -340,7 +340,7 @@ export default {
                     state.isOpenAndLoading = false;
                     state.docker.url = res.data.url;
                     state.docker.remain = res.data.timeout;
-                    state.docker.createDate = res.data.create_date;
+                    state.docker.createDate = res.data.create_date - 8*3600*1000;
 
                     let h = () => {
                         if (state.docker.remain > 0) {
