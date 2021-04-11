@@ -1,22 +1,21 @@
 <template>
-  <div class="home"></div>
+  <el-row
+    style="text-align: center;margin-top: 5%"
+    type="flex"
+    justify="space-between"
+    v-nss-title="'主页'"
+  >
+    <el-col :span="24">
+      <el-image :src="require('@/assets/image/logo2.jpg')" />
+      <h1>Welcome to NSSCTF</h1>
+      <!-- <h1>No System is Safe.</h1> -->
+    </el-col>
+  </el-row>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
-
-@Options({
-  components: {
-    HelloWorld,
-  },
-})
-export default class Home extends Vue {}
+export default{ }
 </script>
 
 <style lang="scss">
-.home {
-  background: url('~@/assets/image/logo.png') center center no-repeat;
-  background-size: 100px auto;
-}
 </style>

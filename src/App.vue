@@ -15,10 +15,10 @@
         <navbar />
       </el-header>
       <el-main style="overflow: visible;">
-        <div style="min-height: 87%">
+        <div style="min-height: 76%">
           <router-view />
         </div>
-        <div style="height: 80px;bottom: 0">
+        <div style="max-height: 80px;bottom: 0">
           <selfFooter />
         </div>
       </el-main>
